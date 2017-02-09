@@ -10,6 +10,9 @@
 
 #include <avr/io.h>
 
+int isPrime(unsigned long nr);
+void writeLong(unsigned long nr);
+
 		//****************************************//
 		//**********        INIT        **********//
 		//****************************************//
@@ -48,10 +51,11 @@ void LCD_init(void){
 uint16_t charNrStencils[10] = {0x1551, 0x0110, 0x1E11, 0x1B11, 0x0B50, 0x1B41, 0x1F41, 0x0111, 0x1F51, 0x1B51};
 void writeChar(char c, int pos){
 	if(pos < 0 && pos > 5) return;
-	uint8_t ch = (uint8_t c)-0x30; //if int
+	uint8_t ch = c;
+	ch-= 0x30;
 
-	uint8_t shift = pos%2 ? 0x00 : 0x04;
-	uint8_t mask = pos%2 ? 0xF0 : 0x0F;
+	uint8_t shift = pos%2 ? 0x04 : 0x00;
+	uint8_t mask = pos%2 ? 0x0F : 0xF0;
 	uint16_t stencil = charNrStencils[ch];
 
 	uint8_t *memPtr = &LCDDR0;
@@ -64,7 +68,7 @@ void writeChar(char c, int pos){
 	}
 }
 
-void clearChar(int pos){{
+void clearChar(int pos){
 	if(pos < 0 && pos > 5) return;
 
 	uint8_t mask = pos%2 ? 0xF0 : 0x0F;
@@ -79,8 +83,8 @@ void clearChar(int pos){{
 void writeLong(unsigned long nr){
 	for(int i = 0; (i < 6); i++){
 		if(nr > 0){
-			uint8_t tnr = uint8_t (nr%10);
-			writeChar(char (tnr+48), i);
+			uint8_t tnr = nr%10;
+			writeChar(tnr+48, 5-i);
 			nr/= 10;
 		}else{
 			clearChar(i);
@@ -92,10 +96,13 @@ void writeLong(unsigned long nr){
 		//**********       PRIME        **********//
 		//****************************************//
 
-void primes(void){
+void prime(){
 	for(unsigned long i = 1;; i++)
-		if(isPrime(i))
+		if(isPrime(i)){
 			writeLong(i);
+			for(unsigned int j = 0; j < 65000; j++);
+			for(unsigned int j = 0; j < 65000; j++);
+		}
 }
 
 int isPrime(unsigned long nr){
@@ -105,15 +112,14 @@ int isPrime(unsigned long nr){
 	return 1;
 }
 
-void isPrimes(unsigned long *nr){
-	for(unsigned long i = 2; i*i < (*nr); i++){
+void primes(unsigned long *nr){
+	for(unsigned long i = 2; (i*i) < (*nr); i++){
 		if(!((*nr)%i)){
-			writeLong(*nr);
 			(*nr)++;
 			return;
 		}
 	}
-	writelong(*nr);
+	writeLong(*nr);
 	(*nr)++;
 }
 
@@ -122,7 +128,7 @@ void isPrimes(unsigned long *nr){
 		//****************************************//
 
 void blink(){
-	for(;;){
+	while(1){
 		while(TCNT1 <= 0x3D09);
 		LCDDR13^= 0x01;
 		TCNT1 = 0x00;
@@ -141,14 +147,13 @@ void blinks(){
 		//****************************************//
 
 void button(){
-	for(;;){
+	while(1){
 		LCDDR18 = (LCDDR18 & 0x01) ? 0x00 : 0x01;
-		LCDDR8 = (~LCDDR18) & 0x01;
+		LCDDR8 = ((~LCDDR18) & 0x01);
 		while(PINB & (0x1<<PINB7));
 		while(!(PINB & (0x1<<PINB7)));
 	}
 }
-
 void buttons(int *state){
 	if((PINB & (0x1<<PINB7)) && *state){
 		LCDDR18 = (LCDDR18 & 0x01) ? 0x00 : 0x01;
@@ -163,29 +168,30 @@ void buttons(int *state){
 		//**********        MAIN        **********//
 		//****************************************//
 
-int main(void){
+void main(){
 	/*** Part 1 ***/
 	CLK_init();
 	LCD_init();
-
-	primes();
-
+/*
+	prime();
+*/
 	/*** Part 2 ***/
 	TIM_init();
-
+/*
 	blink();
-
+*/
 	/*** Part 3 ***/
 	BTN_init();
-
+/*
 	button();
-
+*/
 	/*** Part 4 ***/
+	int state = 0;
 	unsigned long prime = 1;
 	for(;;){
 		blinks();
-		buttons();
-		isPrimes(&prime);
+		buttons(&state);
+		primes(&prime);
 	}
 	while(1);
 }
