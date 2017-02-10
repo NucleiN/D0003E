@@ -11,6 +11,9 @@
 #define SETSTACK(buf,a) *((unsigned int *)(buf)+8) = (unsigned int)(a) + STACKSIZE - 4; \
                         *((unsigned int *)(buf)+9) = (unsigned int)(a) + STACKSIZE - 4
 
+void BTN_init(void);
+void TIM_init(void);
+
 struct thread_block {
     void (*function)(int);   // code to run
     int arg;                 // argument to the above
@@ -35,7 +38,9 @@ static void initialize(void) {
         threads[i].next = &threads[i+1];
     threads[NTHREADS-1].next = NULL;
 
-
+	BTN_init();
+	TIM_init();
+	
     initialized = 1;
 }
 
@@ -100,11 +105,25 @@ void yield(void) {
 }
 
 void lock(mutex *m) {
-
+	DISABLE();
+	if(m->locked == 0){
+		m->locked = 1;
+	}else{
+		enqueue(current, &(m->waitQ));
+		dispatch(dequeue(&readyQ));
+	}
+	ENABLE();
 }
 
 void unlock(mutex *m) {
-
+	DISABLE();
+	if(m->waitQ == NULL){
+		m->locked = 0;
+	}else{
+		enqueue(current, &readyQ);
+		dispatch(dequeue(&(m->waitQ)));
+	}
+	ENABLE();
 }
 
 void TIM_init(void){
@@ -115,4 +134,22 @@ void TIM_init(void){
 	//		Interrupt En
 	TIMSK1 = (1<<OCIE1A);
 	TCNT1 = 0;
+}
+
+void BTN_init(void){
+	//		IT EN pins
+	EIMSK = (1<<PCIE1);
+	//		IT EN pin 15
+	PCMSK1 = (1<<PCINT15);
+	//		Pullup
+	PORTB = (1<<PINB7);
+}
+
+ISR(PCINT1_vect) { // BTN IE
+	if(!(PINB & (1<<PINB7)))
+		yield();
+}
+
+ISR(TIMER1_COMPA_vect){ // TIM IE
+	yield();
 }

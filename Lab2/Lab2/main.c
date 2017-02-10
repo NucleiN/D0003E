@@ -8,10 +8,6 @@ void CLK_init(void){
 	CLKPR = 0x00;
 }
 
-void BTN_init(void){
-	PORTB = (1 << PINB7);
-}
-
 void LCD_init(void){
 	//		Enable LCD | LPow Waveform
 	LCDCRA = (1<<LCDEN) | (1<<LCDAB);
@@ -50,11 +46,15 @@ int is_prime(long nr){
 	return 1;
 }
 
+mutex mpp;
+int pp;
 void printAt(long num, int pos) {
-    int pp = pos;
+	lock(&mpp);
+    pp = pos;
     writeChar( (num % 100) / 10 + '0', pp);
     pp++;
     writeChar( num % 10 + '0', pp);
+	unlock(&mpp);
 }
 
 void computePrimes(int pos) {
@@ -63,7 +63,7 @@ void computePrimes(int pos) {
     for(n = 1; ; n++) {
         if (is_prime(n)) {
             printAt(n, pos);
-            yield();
+            //yield();
         }
     }
 }
