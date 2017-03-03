@@ -187,7 +187,31 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="codeUtils.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="codeUtils.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GUI.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="GUI.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="KEY.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="KEY.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="PWM.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="PWM.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="TinyTimber.c">

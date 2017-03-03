@@ -52,7 +52,11 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../codeUtils.c \
+../GUI.c \
+../KEY.c \
 ../main.c \
+../PWM.c \
 ../TinyTimber.c \
 ../src/ASF/mega/boards/stk600/rcx_x/init.c
 
@@ -64,22 +68,38 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+codeUtils.o \
+GUI.o \
+KEY.o \
 main.o \
+PWM.o \
 TinyTimber.o \
 src/ASF/mega/boards/stk600/rcx_x/init.o
 
 OBJS_AS_ARGS +=  \
+codeUtils.o \
+GUI.o \
+KEY.o \
 main.o \
+PWM.o \
 TinyTimber.o \
 src/ASF/mega/boards/stk600/rcx_x/init.o
 
 C_DEPS +=  \
+codeUtils.d \
+GUI.d \
+KEY.d \
 main.d \
+PWM.d \
 TinyTimber.d \
 src/ASF/mega/boards/stk600/rcx_x/init.d
 
 C_DEPS_AS_ARGS +=  \
+codeUtils.d \
+GUI.d \
+KEY.d \
 main.d \
+PWM.d \
 TinyTimber.d \
 src/ASF/mega/boards/stk600/rcx_x/init.d
 
@@ -97,6 +117,14 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
+
+
+
+
 
 
 
