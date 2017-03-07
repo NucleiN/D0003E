@@ -52,15 +52,15 @@
 #define ENABLE(s)       if (s) sei();
 #define SLEEP()         { SMCR = 0x01; __asm__ __volatile__ ("sleep" ::); }
 #define PANIC()         { LCDDR0 = 0xFF; LCDDR1 = 0xFF; LCDDR2 = 0xFF; while (1) SLEEP(); }
-                        // Light up the display...
-#define SETSTACK(buf,a) { *((unsigned int *)(buf)+8) = (unsigned int)(a) + STACKSIZE - 4; \
+// Light up the display...
+#define SETSTACK(buf, a) { *((unsigned int *)(buf)+8) = (unsigned int)(a) + STACKSIZE - 4; \
                           *((unsigned int *)(buf)+9) = (unsigned int)(a) + STACKSIZE - 4; }
 #define SETPC(buf, a)   *((unsigned int *)((unsigned char *)(buf) + 21)) = (unsigned int)(a)
 
 #define TIMER_INIT()    { CLKPR = 0x80; CLKPR = 0x00; \
                           TCNT1 = 0x0000; TCCR1B = 0x04; TIMSK1 = 0x01; }
-                        // No system clock prescaling
-                        // Normal mode, clk/256 prescaling, enable timer overflow interrupts
+// No system clock prescaling
+// Normal mode, clk/256 prescaling, enable timer overflow interrupts
 #define TIMER_OCLR()    // No timer overflow interrupt clear necessary
 #define TIMER_CCLR()    // No timer compare interrupt clear necessary
 #define TIMERGET(x)     (x) = ((Time)overflows << 16) | (unsigned int)TCNT1; \
@@ -73,7 +73,7 @@
                         }
 #define HIGH16(x)       (int)((x) >> 16)
 #define LOW16(x)        (unsigned int)((x) & 0xffff)
-#define MAX(a,b)        ( (a)-(b) <= 0 ? (b) : (a) )
+#define MAX(a, b)        ( (a)-(b) <= 0 ? (b) : (a) )
 #define INFINITY        0x7fffffffL
 #define INF(a)          ( (a)==0 ? INFINITY : (a) )
 
@@ -101,23 +101,23 @@ struct stack {
     unsigned char stack[STACKSIZE];
 };
 
-struct msg_block    messages[NMSGS];
+struct msg_block messages[NMSGS];
 struct thread_block threads[NTHREADS];
-struct stack        stacks[NTHREADS];
+struct stack stacks[NTHREADS];
 
 struct thread_block thread0;
 
-Msg msgPool         = messages;
-Msg msgQ            = NULL;
-Msg timerQ          = NULL;
-Time timestamp      = 0;
-int overflows       = 0;
+Msg msgPool = messages;
+Msg msgQ = NULL;
+Msg timerQ = NULL;
+Time timestamp = 0;
+int overflows = 0;
 
-Thread threadPool   = threads;
-Thread activeStack  = &thread0;
-Thread current      = &thread0;
+Thread threadPool = threads;
+Thread activeStack = &thread0;
+Thread current = &thread0;
 
-Method  mtable[N_VECTORS];
+Method mtable[N_VECTORS];
 Object *otable[N_VECTORS];
 
 static void schedule(void);
@@ -125,26 +125,26 @@ static void schedule(void);
 #define TIMER_COMPARE_INTERRUPT  ISR(TIMER1_COMPA_vect)
 #define TIMER_OVERFLOW_INTERRUPT ISR(TIMER1_OVF_vect)
 
-#define IRQ(n,v) ISR(v) { TIMERGET(timestamp); if (mtable[n]) mtable[n](otable[n],n); schedule(); }
+#define IRQ(n, v) ISR(v) { TIMERGET(timestamp); if (mtable[n]) mtable[n](otable[n],n); schedule(); }
 
-IRQ(IRQ_INT0,            INT0_vect);
-IRQ(IRQ_PCINT0,          PCINT0_vect);
-IRQ(IRQ_PCINT1,          PCINT1_vect);
-IRQ(IRQ_TIMER2_COMP,     TIMER2_COMP_vect);
-IRQ(IRQ_TIMER2_OVF,      TIMER2_OVF_vect);
-IRQ(IRQ_TIMER0_COMP,     TIMER0_COMP_vect);
-IRQ(IRQ_TIMER0_OVF,      TIMER0_OVF_vect);
-IRQ(IRQ_SPI_STC,         SPI_STC_vect);
-IRQ(IRQ_USART0_RX,       USART0_RX_vect);
-IRQ(IRQ_USART0_UDRE,     USART0_UDRE_vect);
-IRQ(IRQ_USART0_TX,       USART0_TX_vect);
-IRQ(IRQ_USI_START,       USI_START_vect);
-IRQ(IRQ_USI_OVERFLOW,    USI_OVERFLOW_vect);
-IRQ(IRQ_ANALOG_COMP,     ANALOG_COMP_vect);
-IRQ(IRQ_ADC,             ADC_vect);
-IRQ(IRQ_EE_READY,        EE_READY_vect);
-IRQ(IRQ_SPM_READY,       SPM_READY_vect);
-IRQ(IRQ_LCD,             LCD_vect);
+IRQ(IRQ_INT0, INT0_vect);
+IRQ(IRQ_PCINT0, PCINT0_vect);
+IRQ(IRQ_PCINT1, PCINT1_vect);
+IRQ(IRQ_TIMER2_COMP, TIMER2_COMP_vect);
+IRQ(IRQ_TIMER2_OVF, TIMER2_OVF_vect);
+IRQ(IRQ_TIMER0_COMP, TIMER0_COMP_vect);
+IRQ(IRQ_TIMER0_OVF, TIMER0_OVF_vect);
+IRQ(IRQ_SPI_STC, SPI_STC_vect);
+IRQ(IRQ_USART0_RX, USART0_RX_vect);
+IRQ(IRQ_USART0_UDRE, USART0_UDRE_vect);
+IRQ(IRQ_USART0_TX, USART0_TX_vect);
+IRQ(IRQ_USI_START, USI_START_vect);
+IRQ(IRQ_USI_OVERFLOW, USI_OVERFLOW_vect);
+IRQ(IRQ_ANALOG_COMP, ANALOG_COMP_vect);
+IRQ(IRQ_ADC, ADC_vect);
+IRQ(IRQ_EE_READY, EE_READY_vect);
+IRQ(IRQ_SPM_READY, SPM_READY_vect);
+IRQ(IRQ_LCD, LCD_vect);
 
 /* queue manager */
 void enqueueByDeadline(Msg p, Msg *queue) {
@@ -162,7 +162,7 @@ void enqueueByDeadline(Msg p, Msg *queue) {
 
 void enqueueByBaseline(Msg p, Msg *queue) {
     Msg prev = NULL, q = *queue;
-    while (q && (q->baseline <= p->baseline )) {
+    while (q && (q->baseline <= p->baseline)) {
         prev = q;
         q = q->next;
     }
@@ -177,8 +177,7 @@ Msg dequeue(Msg *queue) {
     Msg m = *queue;
     if (m)
         *queue = m->next;
-    else
-        PANIC();  // Empty queue, kernel panic!!!
+    else PANIC();  // Empty queue, kernel panic!!!
     return m;
 }
 
@@ -215,47 +214,48 @@ static int remove(Msg m, Msg *queue) {
 }
 
 TIMER_OVERFLOW_INTERRUPT {
-    TIMER_OCLR();
-    overflows++;
-    TIMERSET(timerQ);
+        TIMER_OCLR();
+        overflows++;
+        TIMERSET(timerQ);
 }
 
 TIMER_COMPARE_INTERRUPT {
-    Time now;
-    TIMER_CCLR();
-    TIMERGET(now);
-    while (timerQ && (timerQ->baseline - now <= 0))
+        Time now;
+        TIMER_CCLR();
+        TIMERGET(now);
+        while (timerQ && (timerQ->baseline - now <= 0))
         enqueueByDeadline( dequeue(&timerQ), &msgQ );
-    TIMERSET(timerQ);
-    schedule();
+        TIMERSET(timerQ);
+        schedule();
 }
 
 /* context switching */
-static void dispatch( Thread next ) {
-    if (setjmp( current->context ) == 0) {
+static void dispatch(Thread next) {
+    if (setjmp(current->context) == 0) {
         current = next;
-        longjmp( next->context, 1 );
+        longjmp(next->context, 1);
     }
 }
 
 static void run(void) {
     while (1) {
-        Msg this = current->msg = dequeue(&msgQ);
+        Msg
+        this = current->msg = dequeue(&msgQ);
         Msg oldMsg;
         char status = 1;
-        
+
         ENABLE(status);
         SYNC(this->to, this->method, this->arg);
         DISABLE(status);
         insert(this, &msgPool);
-       
+
         oldMsg = activeStack->next->msg;
         if (!msgQ || (oldMsg && (msgQ->deadline - oldMsg->deadline > 0))) {
             Thread t;
             push(pop(&activeStack), &threadPool);
             t = activeStack;  // can't be NULL, may be &thread0
-            while (t->waitsFor) 
-	            t = t->waitsFor->ownedBy;
+            while (t->waitsFor)
+                t = t->waitsFor->ownedBy;
             dispatch(t);
         }
     }
@@ -284,12 +284,12 @@ Msg async(Time bl, Time dl, Object *to, Method meth, int arg) {
     char status;
     DISABLE(status);
     m = dequeue(&msgPool);
-    m->to = to; 
-    m->method = meth; 
+    m->to = to;
+    m->method = meth;
     m->arg = arg;
     m->baseline = (status ? current->msg->baseline : timestamp) + bl;
     m->deadline = m->baseline + (dl > 0 ? dl : INFINITY);
-    
+
     TIMERGET(now);
     if (m->baseline - now > 0) {        // baseline has not yet passed
         enqueueByBaseline(m, &timerQ);
@@ -301,7 +301,7 @@ Msg async(Time bl, Time dl, Object *to, Method meth, int arg) {
             dispatch(activeStack);
         }
     }
-    
+
     ENABLE(status);
     return m;
 }
@@ -310,11 +310,11 @@ int sync(Object *to, Method meth, int arg) {
     Thread t;
     int result;
     char status, status_ignore;
-    
+
     DISABLE(status);
     t = to->ownedBy;
     if (t) {                            // to is already locked
-        while (t->waitsFor) 
+        while (t->waitsFor)
             t = t->waitsFor->ownedBy;
         if (t == current || !status) {  // deadlock!
             ENABLE(status);
@@ -334,10 +334,10 @@ int sync(Object *to, Method meth, int arg) {
     ENABLE(status && (to->wantedBy != INSTALLED_TAG));
     result = meth(to, arg);
     DISABLE(status_ignore);
-    to->ownedBy = NULL; 
+    to->ownedBy = NULL;
     t = to->wantedBy;
     if (t && (t != INSTALLED_TAG)) {      // we have run on someone's behalf
-        to->wantedBy = NULL; 
+        to->wantedBy = NULL;
         t->waitsFor = NULL;
         dispatch(t);
     }
@@ -354,9 +354,9 @@ void ABORT(Msg m) {
         Thread t = activeStack;
         while (t) {
             if ((t != current) && (t->msg == m) && (t->waitsFor == m->to)) {
-	            t->msg = NULL;
-	            insert(m, &msgPool);
-	            break;
+                t->msg = NULL;
+                insert(m, &msgPool);
+                break;
             }
             t = t->next;
         }
@@ -381,30 +381,30 @@ Time CURRENT_OFFSET(void) {
     return now - (status ? current->msg->baseline : timestamp);
 }
 
-    
+
 /* initialization */
 static void initialize(void) {
     int i;
 
-    for (i=0; i<NMSGS-1; i++)
-        messages[i].next = &messages[i+1];
-    messages[NMSGS-1].next = NULL;
-    
-    for (i=0; i<NTHREADS-1; i++)
-        threads[i].next = &threads[i+1];
-    threads[NTHREADS-1].next = NULL;
-    
-    for (i=0; i<NTHREADS; i++) {
-        setjmp( threads[i].context );
-        SETSTACK( &threads[i].context, &stacks[i] );
-        SETPC( &threads[i].context, run );
+    for (i = 0; i < NMSGS - 1; i++)
+        messages[i].next = &messages[i + 1];
+    messages[NMSGS - 1].next = NULL;
+
+    for (i = 0; i < NTHREADS - 1; i++)
+        threads[i].next = &threads[i + 1];
+    threads[NTHREADS - 1].next = NULL;
+
+    for (i = 0; i < NTHREADS; i++) {
+        setjmp(threads[i].context);
+        SETSTACK(&threads[i].context, &stacks[i]);
+        SETPC(&threads[i].context, run);
         threads[i].waitsFor = NULL;
     }
 
     thread0.next = NULL;
     thread0.waitsFor = NULL;
     thread0.msg = NULL;
-    
+
     TIMER_INIT();
 }
 

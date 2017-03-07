@@ -988,15 +988,15 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x3217
+.debug_info     0x00000000     0x3208
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x7b6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega169p/avr5/crtatmega169p.o
  .debug_info    0x000007b6      0x2aa codeUtils.o
  .debug_info    0x00000a60      0x4bb GUI.o
- .debug_info    0x00000f1b      0x89d KEY.o
- .debug_info    0x000017b8      0x56c main.o
- .debug_info    0x00001d24      0x2f9 PWM.o
- .debug_info    0x0000201d     0x11fa TinyTimber.o
+ .debug_info    0x00000f1b      0x88e KEY.o
+ .debug_info    0x000017a9      0x56c main.o
+ .debug_info    0x00001d15      0x2f9 PWM.o
+ .debug_info    0x0000200e     0x11fa TinyTimber.o
 
 .debug_abbrev   0x00000000     0x11b4
  *(.debug_abbrev)
@@ -1027,21 +1027,21 @@ END GROUP
  .debug_frame   0x00000290       0x7c PWM.o
  .debug_frame   0x0000030c      0x950 TinyTimber.o
 
-.debug_str      0x00000000     0x8380
+.debug_str      0x00000000     0x8344
  *(.debug_str)
  .debug_str     0x00000000      0x2b3 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega169p/avr5/crtatmega169p.o
- .debug_str     0x000002b3     0x6df0 codeUtils.o
-                               0x6e99 (size before relaxing)
- .debug_str     0x000070a3      0x758 GUI.o
+ .debug_str     0x000002b3     0x6df2 codeUtils.o
+                               0x6e9b (size before relaxing)
+ .debug_str     0x000070a5      0x71a GUI.o
                                0x7543 (size before relaxing)
- .debug_str     0x000077fb      0x23c KEY.o
+ .debug_str     0x000077bf      0x23c KEY.o
                                0x7716 (size before relaxing)
- .debug_str     0x00007a37      0x130 main.o
+ .debug_str     0x000079fb      0x130 main.o
                                0x7808 (size before relaxing)
- .debug_str     0x00007b67       0x47 PWM.o
-                               0x6f5a (size before relaxing)
- .debug_str     0x00007bae      0x7d2 TinyTimber.o
-                               0x7a98 (size before relaxing)
+ .debug_str     0x00007b2b       0x47 PWM.o
+                               0x6f5c (size before relaxing)
+ .debug_str     0x00007b72      0x7d2 TinyTimber.o
+                               0x7a9a (size before relaxing)
 
 .debug_loc      0x00000000     0x2c00
  *(.debug_loc)
