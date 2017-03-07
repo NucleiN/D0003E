@@ -1026,7 +1026,7 @@ END GROUP
  .debug_frame   0x00000290       0x7c PWM.o
  .debug_frame   0x0000030c      0x950 TinyTimber.o
 
-.debug_str      0x00000000     0x8342
+.debug_str      0x00000000     0x8306
  *(.debug_str)
  .debug_str     0x00000000      0x2b3 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega169p/avr5/crtatmega169p.o
  .debug_str     0x000002b3     0x6df0 codeUtils.o
@@ -1039,7 +1039,7 @@ END GROUP
                                0x77d8 (size before relaxing)
  .debug_str     0x00007aed       0x47 PWM.o
                                0x6f5a (size before relaxing)
- .debug_str     0x00007b34      0x80e TinyTimber.o
+ .debug_str     0x00007b34      0x7d2 TinyTimber.o
                                0x7a98 (size before relaxing)
 
 .debug_loc      0x00000000     0x2c89

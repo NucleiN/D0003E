@@ -69,7 +69,7 @@ typedef struct msg_block *Msg;
 
 //      Base type for methods. Every method in a TinyTimber system should take 
 //      a first argument that is a reference to a subclass of class Object.
-typedef int (*Method)(Object *, int);
+typedef int (*Method)(Object*, int);
 
 //      Unit pointer value.
 #define NULL 0
@@ -119,7 +119,7 @@ typedef signed long Time;
         ((Time)(((x) * (Time)125) / 4))
 //      Construct a Time value from an argument given in seconds.
 #define SEC(x) \
-        (((x) * (Time)31250))
+        (((x) * (Time)31250)) 
 //      Extract the microsecond fraction of a Time value
 #define USEC_OF(t) \
         (int)(((t) % ((Time)31250)) * 32)
@@ -130,27 +130,27 @@ typedef signed long Time;
 #define SEC_OF(t) \
         (int)((t) / ((Time)31250))
 
-enum Vector {
-    IRQ_INT0,
-    IRQ_PCINT0,
-    IRQ_PCINT1,
-    IRQ_TIMER2_COMP,
-    IRQ_TIMER2_OVF,
-    IRQ_TIMER0_COMP,
-    IRQ_TIMER0_OVF,
-    IRQ_SPI_STC,
-    IRQ_USART0_RX,
-    IRQ_USART0_UDRE,
-    IRQ_USART0_TX,
-    IRQ_USI_START,
-    IRQ_USI_OVERFLOW,
-    IRQ_ANALOG_COMP,
-    IRQ_ADC,
-    IRQ_EE_READY,
-    IRQ_SPM_READY,
-    IRQ_LCD,
+enum Vector { 
+        IRQ_INT0, 
+        IRQ_PCINT0, 
+        IRQ_PCINT1, 
+        IRQ_TIMER2_COMP, 
+        IRQ_TIMER2_OVF, 
+        IRQ_TIMER0_COMP, 
+        IRQ_TIMER0_OVF,
+        IRQ_SPI_STC, 
+        IRQ_USART0_RX, 
+        IRQ_USART0_UDRE, 
+        IRQ_USART0_TX, 
+        IRQ_USI_START, 
+        IRQ_USI_OVERFLOW,
+        IRQ_ANALOG_COMP, 
+        IRQ_ADC, 
+        IRQ_EE_READY, 
+        IRQ_SPM_READY, 
+        IRQ_LCD,
 
-    N_VECTORS
+	N_VECTORS
 };
 
 //      Prematurely aborts pending asynchronous message m.  Does nothing if m 
@@ -163,7 +163,7 @@ void ABORT(Msg m);
 //      interrupt source i. Type T must be a struct type that inherits
 //      from Object. When an interrupt on i occurs, meth will be
 //      invoked on obj with i as its argument.
-#define INSTALL(obj, meth, i) install((Object*)obj, (Method)meth, i)
+#define INSTALL(obj,meth,i) install((Object*)obj, (Method)meth, i)
 
 //  int TINYTIMBER ( T* obj, int (*meth)(T*, A), A arg )
 //      Start up the TinyTimber system by invoking method meth on obj with
@@ -171,7 +171,7 @@ void ABORT(Msg m);
 //      events as they occur. Type T must be a struct type that inherits
 //      from Object, while A can be any int-sized type. This function never
 //      returns.
-#define TINYTIMBER(obj, meth, arg) tinytimber((Object*)obj, (Method)meth, (int)arg)
+#define TINYTIMBER(obj,meth,arg) tinytimber((Object*)obj, (Method)meth, (int)arg)
 
 
 //      Built-in type of primitive baseline timers
@@ -197,12 +197,9 @@ Time CURRENT_OFFSET(void);
 // -------------------------------------------------------------------
 
 
-Msg async(Time bl, Time dl, Object *to, Method m, int arg);
-
+Msg async(Time bl, Time dl, Object *to, Method m, int arg);   
 int sync(Object *to, Method m, int arg);
-
 void install(Object *obj, Method m, enum Vector index);
-
 int tinytimber(Object *obj, Method startup, int arg);
 
 

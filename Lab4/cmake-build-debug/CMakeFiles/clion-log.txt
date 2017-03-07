@@ -1,2 +1,0 @@
-CMakeLists.txt not found in C:\Users\Leo\Documents\GitHub\D0003E\D0003E\Lab4
-Cannot load CMake project: Neither MinGW nor Cygwin is selected
