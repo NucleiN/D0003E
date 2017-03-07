@@ -23,13 +23,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  00000c5c  00000000  00000000  00008de8  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00008306  00000000  00000000  00009a44  2**0
+ 10 .debug_str    00008342  00000000  00000000  00009a44  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00002c89  00000000  00000000  00011d4a  2**0
+ 11 .debug_loc    00002c89  00000000  00000000  00011d86  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000210  00000000  00000000  000149d3  2**0
+ 12 .debug_ranges 00000210  00000000  00000000  00014a0f  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_macro  00002e23  00000000  00000000  00014be3  2**0
+ 13 .debug_macro  00002e23  00000000  00000000  00014c1f  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -109,90 +109,49 @@ Disassembly of section .text:
       94:	b5 cf       	rjmp	.-150    	; 0x0 <__vectors>
 
 00000096 <LCD_init>:
-
-#include "codeUtils.h"
-
-void LCD_init(void){
-	//		Enable LCD | LPow Waveform
-	LCDCRA = (1<<LCDEN) | (1<<LCDAB);
       96:	80 ec       	ldi	r24, 0xC0	; 192
       98:	80 93 e4 00 	sts	0x00E4, r24	; 0x8000e4 <__TEXT_REGION_LENGTH__+0x7e00e4>
-	//		Async clksrc | 1/4 Duty | 25 segments
-	LCDCRB = (1<<LCDCS) | (1<<LCDMUX1) | (1<<LCDMUX0) | (1<<LCDPM2) | (1<<LCDPM1) | (1<<LCDPM0);
       9c:	87 eb       	ldi	r24, 0xB7	; 183
       9e:	80 93 e5 00 	sts	0x00E5, r24	; 0x8000e5 <__TEXT_REGION_LENGTH__+0x7e00e5>
-	//		divide by 8
-	LCDFRR = (1<<LCDCD2) | (1<<LCDCD1) | (1<<LCDCD0);
       a2:	87 e0       	ldi	r24, 0x07	; 7
       a4:	80 93 e6 00 	sts	0x00E6, r24	; 0x8000e6 <__TEXT_REGION_LENGTH__+0x7e00e6>
-	//		CC Max 3.35V
-	LCDCCR = (1<<LCDCC3) | (1<<LCDCC2) | (1<<LCDCC1) | (1<<LCDCC0);
       a8:	8f e0       	ldi	r24, 0x0F	; 15
       aa:	80 93 e7 00 	sts	0x00E7, r24	; 0x8000e7 <__TEXT_REGION_LENGTH__+0x7e00e7>
       ae:	08 95       	ret
 
 000000b0 <BTN_init>:
-}
-
-void BTN_init(void){
-	EIMSK|= (1<<PCIE1) | (1<<PCIE0);
       b0:	8d b3       	in	r24, 0x1d	; 29
       b2:	80 6c       	ori	r24, 0xC0	; 192
       b4:	8d bb       	out	0x1d, r24	; 29
-
-	PCMSK1|= (1<<PCINT15) | (1<<PCINT14) | (1<<PCINT12);
       b6:	ec e6       	ldi	r30, 0x6C	; 108
       b8:	f0 e0       	ldi	r31, 0x00	; 0
       ba:	80 81       	ld	r24, Z
       bc:	80 6d       	ori	r24, 0xD0	; 208
       be:	80 83       	st	Z, r24
-	PORTB|= (1<<PINB7) | (1<<PINB6) | (1<<PINB4);
       c0:	85 b1       	in	r24, 0x05	; 5
       c2:	80 6d       	ori	r24, 0xD0	; 208
       c4:	85 b9       	out	0x05, r24	; 5
-	
-	PCMSK0|= (1<<PCINT2) | (1<<PCINT3);
       c6:	eb e6       	ldi	r30, 0x6B	; 107
       c8:	f0 e0       	ldi	r31, 0x00	; 0
       ca:	80 81       	ld	r24, Z
       cc:	8c 60       	ori	r24, 0x0C	; 12
       ce:	80 83       	st	Z, r24
-	PORTE|= (1<<PINE3) | (1<<PINE2);
       d0:	8e b1       	in	r24, 0x0e	; 14
       d2:	8c 60       	ori	r24, 0x0C	; 12
       d4:	8e b9       	out	0x0e, r24	; 14
       d6:	08 95       	ret
 
 000000d8 <writeChar>:
-}
-
-static uint16_t charNrStencils[10] = {0x1551, 0x0110, 0x1E11, 0x1B11, 0x0B50, 0x1B41, 0x1F41, 0x0111, 0x1F51, 0x1B51};
-void writeChar(char c, int pos){
       d8:	ab 01       	movw	r20, r22
-	if(pos < 0 && pos > 5) return;
-	cli();
       da:	f8 94       	cli
-	uint8_t ch = c;
-	ch-= 0x30;
       dc:	80 53       	subi	r24, 0x30	; 48
-
-	uint8_t shift = pos%2 ? 0x04 : 0x00;
       de:	60 ff       	sbrs	r22, 0
       e0:	03 c0       	rjmp	.+6      	; 0xe8 <writeChar+0x10>
       e2:	74 e0       	ldi	r23, 0x04	; 4
-	uint8_t mask = pos%2 ? 0x0F : 0xF0;
       e4:	af e0       	ldi	r26, 0x0F	; 15
       e6:	02 c0       	rjmp	.+4      	; 0xec <writeChar+0x14>
-	if(pos < 0 && pos > 5) return;
-	cli();
-	uint8_t ch = c;
-	ch-= 0x30;
-
-	uint8_t shift = pos%2 ? 0x04 : 0x00;
       e8:	70 e0       	ldi	r23, 0x00	; 0
-	uint8_t mask = pos%2 ? 0x0F : 0xF0;
       ea:	a0 ef       	ldi	r26, 0xF0	; 240
-	uint16_t stencil = charNrStencils[ch];
       ec:	e8 2f       	mov	r30, r24
       ee:	f0 e0       	ldi	r31, 0x00	; 0
       f0:	ee 0f       	add	r30, r30
@@ -201,9 +160,6 @@ void writeChar(char c, int pos){
       f6:	fe 4f       	sbci	r31, 0xFE	; 254
       f8:	20 81       	ld	r18, Z
       fa:	31 81       	ldd	r19, Z+1	; 0x01
-
-	uint8_t *memPtr = &LCDDR0;
-	memPtr+= pos/2;
       fc:	fa 01       	movw	r30, r20
       fe:	ff 23       	and	r31, r31
      100:	0c f4       	brge	.+2      	; 0x104 <writeChar+0x2c>
@@ -215,9 +171,6 @@ void writeChar(char c, int pos){
      10c:	af 01       	movw	r20, r30
      10e:	4c 5e       	subi	r20, 0xEC	; 236
      110:	5f 4f       	sbci	r21, 0xFF	; 255
-	for(int iq = 0; iq < 4; iq++){
-		*memPtr&= mask;
-		*memPtr|= (stencil & 0x0F) << shift;
      112:	c9 01       	movw	r24, r18
      114:	8f 70       	andi	r24, 0x0F	; 15
      116:	99 27       	eor	r25, r25
@@ -227,61 +180,31 @@ void writeChar(char c, int pos){
      11e:	99 1f       	adc	r25, r25
      120:	0a 94       	dec	r0
      122:	e2 f7       	brpl	.-8      	; 0x11c <writeChar+0x44>
-	uint16_t stencil = charNrStencils[ch];
-
-	uint8_t *memPtr = &LCDDR0;
-	memPtr+= pos/2;
-	for(int iq = 0; iq < 4; iq++){
-		*memPtr&= mask;
      124:	90 81       	ld	r25, Z
      126:	9a 23       	and	r25, r26
-		*memPtr|= (stencil & 0x0F) << shift;
      128:	89 2b       	or	r24, r25
      12a:	80 83       	st	Z, r24
-		stencil>>= 0x04;
      12c:	32 95       	swap	r19
      12e:	22 95       	swap	r18
      130:	2f 70       	andi	r18, 0x0F	; 15
      132:	23 27       	eor	r18, r19
      134:	3f 70       	andi	r19, 0x0F	; 15
      136:	23 27       	eor	r18, r19
-		memPtr+= 0x05;
      138:	35 96       	adiw	r30, 0x05	; 5
-	uint8_t mask = pos%2 ? 0x0F : 0xF0;
-	uint16_t stencil = charNrStencils[ch];
-
-	uint8_t *memPtr = &LCDDR0;
-	memPtr+= pos/2;
-	for(int iq = 0; iq < 4; iq++){
      13a:	e4 17       	cp	r30, r20
      13c:	f5 07       	cpc	r31, r21
      13e:	49 f7       	brne	.-46     	; 0x112 <writeChar+0x3a>
-		*memPtr&= mask;
-		*memPtr|= (stencil & 0x0F) << shift;
-		stencil>>= 0x04;
-		memPtr+= 0x05;
-	}
-	sei();
      140:	78 94       	sei
      142:	08 95       	ret
 
 00000144 <clearChar>:
-}
-
-void clearChar(int pos){
      144:	9c 01       	movw	r18, r24
-	if(pos < 0 && pos > 5) return;
-	cli();
      146:	f8 94       	cli
-	uint8_t mask = pos%2 ? 0x0F : 0xF0;
      148:	80 fd       	sbrc	r24, 0
      14a:	02 c0       	rjmp	.+4      	; 0x150 <clearChar+0xc>
      14c:	90 ef       	ldi	r25, 0xF0	; 240
      14e:	01 c0       	rjmp	.+2      	; 0x152 <clearChar+0xe>
      150:	9f e0       	ldi	r25, 0x0F	; 15
-
-	uint8_t *memPtr = &LCDDR0;
-	memPtr+= pos/2;
      152:	f9 01       	movw	r30, r18
      154:	ff 23       	and	r31, r31
      156:	0c f4       	brge	.+2      	; 0x15a <clearChar+0x16>
@@ -293,39 +216,21 @@ void clearChar(int pos){
      162:	9f 01       	movw	r18, r30
      164:	2c 5e       	subi	r18, 0xEC	; 236
      166:	3f 4f       	sbci	r19, 0xFF	; 255
-	for(int i = 0; i < 4; i++){
-		*memPtr&= mask;
      168:	80 81       	ld	r24, Z
      16a:	89 23       	and	r24, r25
      16c:	80 83       	st	Z, r24
-		memPtr+= 0x05;
      16e:	35 96       	adiw	r30, 0x05	; 5
-	cli();
-	uint8_t mask = pos%2 ? 0x0F : 0xF0;
-
-	uint8_t *memPtr = &LCDDR0;
-	memPtr+= pos/2;
-	for(int i = 0; i < 4; i++){
      170:	e2 17       	cp	r30, r18
      172:	f3 07       	cpc	r31, r19
      174:	c9 f7       	brne	.-14     	; 0x168 <clearChar+0x24>
-		*memPtr&= mask;
-		memPtr+= 0x05;
-	}
-	sei();
      176:	78 94       	sei
      178:	08 95       	ret
 
 0000017a <printAt>:
-}
-
-void printAt(int num, int pos){
      17a:	1f 93       	push	r17
      17c:	cf 93       	push	r28
      17e:	df 93       	push	r29
      180:	eb 01       	movw	r28, r22
-	int pp = pos;
-	writeChar(((num/10) % 10)+0x30, pp);
      182:	2a e0       	ldi	r18, 0x0A	; 10
      184:	30 e0       	ldi	r19, 0x00	; 0
      186:	b9 01       	movw	r22, r18
@@ -337,29 +242,22 @@ void printAt(int num, int pos){
      196:	be 01       	movw	r22, r28
      198:	80 5d       	subi	r24, 0xD0	; 208
      19a:	9e df       	rcall	.-196    	; 0xd8 <writeChar>
-	pp++;
      19c:	be 01       	movw	r22, r28
      19e:	6f 5f       	subi	r22, 0xFF	; 255
      1a0:	7f 4f       	sbci	r23, 0xFF	; 255
-	writeChar((num % 10)+0x30, pp);
      1a2:	80 e3       	ldi	r24, 0x30	; 48
      1a4:	81 0f       	add	r24, r17
      1a6:	98 df       	rcall	.-208    	; 0xd8 <writeChar>
-}
      1a8:	df 91       	pop	r29
      1aa:	cf 91       	pop	r28
      1ac:	1f 91       	pop	r17
      1ae:	08 95       	ret
 
 000001b0 <clearAt>:
-
-void clearAt(int pos){
      1b0:	cf 93       	push	r28
      1b2:	df 93       	push	r29
      1b4:	ec 01       	movw	r28, r24
-	clearChar(pos);
      1b6:	c6 df       	rcall	.-116    	; 0x144 <clearChar>
-	clearChar(pos+1);
      1b8:	ce 01       	movw	r24, r28
      1ba:	01 96       	adiw	r24, 0x01	; 1
      1bc:	c3 df       	rcall	.-122    	; 0x144 <clearChar>
@@ -368,17 +266,10 @@ void clearAt(int pos){
      1c2:	08 95       	ret
 
 000001c4 <_GUI_print>:
- *  Author: Daniel
- */ 
-
-#include "GUI.h"
-
-int _GUI_print(GUI *g, int arg){
      1c4:	0f 93       	push	r16
      1c6:	1f 93       	push	r17
      1c8:	cf 93       	push	r28
      1ca:	df 93       	push	r29
-	if(g->writeEn || arg){
      1cc:	fc 01       	movw	r30, r24
      1ce:	27 85       	ldd	r18, Z+15	; 0x0f
      1d0:	30 89       	ldd	r19, Z+16	; 0x10
@@ -387,7 +278,6 @@ int _GUI_print(GUI *g, int arg){
      1d6:	67 2b       	or	r22, r23
      1d8:	81 f0       	breq	.+32     	; 0x1fa <_GUI_print+0x36>
      1da:	ec 01       	movw	r28, r24
-		printAt(PWM_getFreq(&(g->p)), g->pos);
      1dc:	0d 85       	ldd	r16, Y+13	; 0x0d
      1de:	1e 85       	ldd	r17, Y+14	; 0x0e
      1e0:	40 e0       	ldi	r20, 0x00	; 0
@@ -398,14 +288,10 @@ int _GUI_print(GUI *g, int arg){
      1ea:	0e 94 f8 0f 	call	0x1ff0	; 0x1ff0 <sync>
      1ee:	b8 01       	movw	r22, r16
      1f0:	c4 df       	rcall	.-120    	; 0x17a <printAt>
-		g->writeEn = 1;
      1f2:	81 e0       	ldi	r24, 0x01	; 1
      1f4:	90 e0       	ldi	r25, 0x00	; 0
      1f6:	98 8b       	std	Y+16, r25	; 0x10
      1f8:	8f 87       	std	Y+15, r24	; 0x0f
-	}
-	return 0;
-}
      1fa:	80 e0       	ldi	r24, 0x00	; 0
      1fc:	90 e0       	ldi	r25, 0x00	; 0
      1fe:	df 91       	pop	r29
@@ -415,20 +301,14 @@ int _GUI_print(GUI *g, int arg){
      206:	08 95       	ret
 
 00000208 <_GUI_clear>:
-
-int _GUI_clear(GUI *g, int arg){
      208:	cf 93       	push	r28
      20a:	df 93       	push	r29
      20c:	ec 01       	movw	r28, r24
-	clearAt(g->pos);
      20e:	8d 85       	ldd	r24, Y+13	; 0x0d
      210:	9e 85       	ldd	r25, Y+14	; 0x0e
      212:	ce df       	rcall	.-100    	; 0x1b0 <clearAt>
-	g->writeEn = 0;
      214:	18 8a       	std	Y+16, r1	; 0x10
      216:	1f 86       	std	Y+15, r1	; 0x0f
-	return 0;
-}
      218:	80 e0       	ldi	r24, 0x00	; 0
      21a:	90 e0       	ldi	r25, 0x00	; 0
      21c:	df 91       	pop	r29
@@ -436,8 +316,6 @@ int _GUI_clear(GUI *g, int arg){
      220:	08 95       	ret
 
 00000222 <_GUI_blinkLoop>:
-
-int _GUI_blinkLoop(GUI *g, int arg){
      222:	af 92       	push	r10
      224:	bf 92       	push	r11
      226:	cf 92       	push	r12
@@ -448,7 +326,6 @@ int _GUI_blinkLoop(GUI *g, int arg){
      230:	1f 93       	push	r17
      232:	cf 93       	push	r28
      234:	df 93       	push	r29
-	if(arg == g->blinkCount){
      236:	fc 01       	movw	r30, r24
      238:	23 89       	ldd	r18, Z+19	; 0x13
      23a:	34 89       	ldd	r19, Z+20	; 0x14
@@ -457,17 +334,14 @@ int _GUI_blinkLoop(GUI *g, int arg){
      240:	09 f0       	breq	.+2      	; 0x244 <_GUI_blinkLoop+0x22>
      242:	4d c0       	rjmp	.+154    	; 0x2de <_GUI_blinkLoop+0xbc>
      244:	ec 01       	movw	r28, r24
-		g->blinkCount++;
      246:	59 01       	movw	r10, r18
      248:	ff ef       	ldi	r31, 0xFF	; 255
      24a:	af 1a       	sub	r10, r31
      24c:	bf 0a       	sbc	r11, r31
      24e:	bc 8a       	std	Y+20, r11	; 0x14
      250:	ab 8a       	std	Y+19, r10	; 0x13
-		if(arg%2){
      252:	20 ff       	sbrs	r18, 0
      254:	22 c0       	rjmp	.+68     	; 0x29a <_GUI_blinkLoop+0x78>
-			GUI_clear(g);
      256:	c1 2c       	mov	r12, r1
      258:	d1 2c       	mov	r13, r1
      25a:	0f 2e       	mov	r0, r31
@@ -484,7 +358,6 @@ int _GUI_blinkLoop(GUI *g, int arg){
      270:	70 e0       	ldi	r23, 0x00	; 0
      272:	cb 01       	movw	r24, r22
      274:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			AFTER(MSEC(300), g, _GUI_blinkLoop, arg+1);
      278:	65 01       	movw	r12, r10
      27a:	0f 2e       	mov	r0, r31
      27c:	f1 e1       	ldi	r31, 0x11	; 17
@@ -501,8 +374,6 @@ int _GUI_blinkLoop(GUI *g, int arg){
      292:	90 e0       	ldi	r25, 0x00	; 0
      294:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
      298:	22 c0       	rjmp	.+68     	; 0x2de <_GUI_blinkLoop+0xbc>
-		}else{
-			GUI_fprint(g);
      29a:	cc 24       	eor	r12, r12
      29c:	c3 94       	inc	r12
      29e:	d1 2c       	mov	r13, r1
@@ -520,7 +391,6 @@ int _GUI_blinkLoop(GUI *g, int arg){
      2b6:	70 e0       	ldi	r23, 0x00	; 0
      2b8:	cb 01       	movw	r24, r22
      2ba:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			AFTER(MSEC(700), g, _GUI_blinkLoop, arg+1);
      2be:	65 01       	movw	r12, r10
      2c0:	0f 2e       	mov	r0, r31
      2c2:	f1 e1       	ldi	r31, 0x11	; 17
@@ -536,10 +406,6 @@ int _GUI_blinkLoop(GUI *g, int arg){
      2d6:	80 e0       	ldi	r24, 0x00	; 0
      2d8:	90 e0       	ldi	r25, 0x00	; 0
      2da:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-		}
-	}
-	return 0;
-}
      2de:	80 e0       	ldi	r24, 0x00	; 0
      2e0:	90 e0       	ldi	r25, 0x00	; 0
      2e2:	df 91       	pop	r29
@@ -555,52 +421,30 @@ int _GUI_blinkLoop(GUI *g, int arg){
      2f6:	08 95       	ret
 
 000002f8 <_GUI_getAltFreq>:
-
-int _GUI_getAltFreq(GUI *g, int arg){
-	return g->altFreq;
-}
      2f8:	fc 01       	movw	r30, r24
      2fa:	81 89       	ldd	r24, Z+17	; 0x11
      2fc:	92 89       	ldd	r25, Z+18	; 0x12
      2fe:	08 95       	ret
 
 00000300 <_GUI_setAltFreq>:
-
-int _GUI_setAltFreq(GUI *g, int arg){
-	g->altFreq = arg;
      300:	fc 01       	movw	r30, r24
      302:	72 8b       	std	Z+18, r23	; 0x12
      304:	61 8b       	std	Z+17, r22	; 0x11
-	return 0;
      306:	80 e0       	ldi	r24, 0x00	; 0
      308:	90 e0       	ldi	r25, 0x00	; 0
      30a:	08 95       	ret
 
 0000030c <_KEY_allowEnter>:
-	}
-	return 0;
-}
-
-int _KEY_allowEnter(KEY *k, int arg){
-	k->enterEn = 1;
      30c:	21 e0       	ldi	r18, 0x01	; 1
      30e:	30 e0       	ldi	r19, 0x00	; 0
      310:	fc 01       	movw	r30, r24
      312:	35 87       	std	Z+13, r19	; 0x0d
      314:	24 87       	std	Z+12, r18	; 0x0c
-	return 0;
-}
      316:	80 e0       	ldi	r24, 0x00	; 0
      318:	90 e0       	ldi	r25, 0x00	; 0
      31a:	08 95       	ret
 
 0000031c <_KEY_loop>:
-	}
-	GUI_print(guin);
-	return 0;
-}
-
-int _KEY_loop(KEY *k, int arg){
      31c:	8f 92       	push	r8
      31e:	9f 92       	push	r9
      320:	af 92       	push	r10
@@ -613,7 +457,6 @@ int _KEY_loop(KEY *k, int arg){
      32e:	1f 93       	push	r17
      330:	cf 93       	push	r28
      332:	df 93       	push	r29
-	if(k->keyCount == arg){
      334:	fc 01       	movw	r30, r24
      336:	c6 80       	ldd	r12, Z+6	; 0x06
      338:	d7 80       	ldd	r13, Z+7	; 0x07
@@ -622,29 +465,23 @@ int _KEY_loop(KEY *k, int arg){
      33e:	09 f0       	breq	.+2      	; 0x342 <_KEY_loop+0x26>
      340:	6b c0       	rjmp	.+214    	; 0x418 <__LOCK_REGION_LENGTH__+0x18>
      342:	ec 01       	movw	r28, r24
-		arg++;
      344:	56 01       	movw	r10, r12
      346:	ff ef       	ldi	r31, 0xFF	; 255
      348:	af 1a       	sub	r10, r31
      34a:	bf 0a       	sbc	r11, r31
-		k->keyCount = arg;
      34c:	bf 82       	std	Y+7, r11	; 0x07
      34e:	ae 82       	std	Y+6, r10	; 0x06
-		GUI *guin = (k->guiSel);
      350:	8c 80       	ldd	r8, Y+4	; 0x04
      352:	9d 80       	ldd	r9, Y+5	; 0x05
-		PWM *pwmn = &(guin->p);
      354:	84 01       	movw	r16, r8
      356:	0c 5f       	subi	r16, 0xFC	; 252
      358:	1f 4f       	sbci	r17, 0xFF	; 255
-		int tfreq = PWM_getFreq(pwmn);
      35a:	40 e0       	ldi	r20, 0x00	; 0
      35c:	50 e0       	ldi	r21, 0x00	; 0
      35e:	63 ee       	ldi	r22, 0xE3	; 227
      360:	74 e0       	ldi	r23, 0x04	; 4
      362:	c8 01       	movw	r24, r16
      364:	0e 94 f8 0f 	call	0x1ff0	; 0x1ff0 <sync>
-		if((tfreq == -1) || (k->dir == 0)){
      368:	8f 3f       	cpi	r24, 0xFF	; 255
      36a:	2f ef       	ldi	r18, 0xFF	; 255
      36c:	92 07       	cpc	r25, r18
@@ -654,20 +491,14 @@ int _KEY_loop(KEY *k, int arg){
      374:	21 15       	cp	r18, r1
      376:	31 05       	cpc	r19, r1
      378:	29 f4       	brne	.+10     	; 0x384 <_KEY_loop+0x68>
-			k->dir = 0;
      37a:	1b 86       	std	Y+11, r1	; 0x0b
      37c:	1a 86       	std	Y+10, r1	; 0x0a
-			k->keyCount = 0;
      37e:	1f 82       	std	Y+7, r1	; 0x07
      380:	1e 82       	std	Y+6, r1	; 0x06
      382:	4c c0       	rjmp	.+152    	; 0x41c <__LOCK_REGION_LENGTH__+0x1c>
-			return;
-		}
-		tfreq+= k->dir;
      384:	6c 01       	movw	r12, r24
      386:	c2 0e       	add	r12, r18
      388:	d3 1e       	adc	r13, r19
-		PWM_setFreq(pwmn,tfreq);
      38a:	0f 2e       	mov	r0, r31
      38c:	f7 ee       	ldi	r31, 0xE7	; 231
      38e:	ef 2e       	mov	r14, r31
@@ -681,7 +512,6 @@ int _KEY_loop(KEY *k, int arg){
      39e:	70 e0       	ldi	r23, 0x00	; 0
      3a0:	cb 01       	movw	r24, r22
      3a2:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-		GUI_print(guin);
      3a6:	c1 2c       	mov	r12, r1
      3a8:	d1 2c       	mov	r13, r1
      3aa:	0f 2e       	mov	r0, r31
@@ -698,7 +528,6 @@ int _KEY_loop(KEY *k, int arg){
      3c0:	70 e0       	ldi	r23, 0x00	; 0
      3c2:	cb 01       	movw	r24, r22
      3c4:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-		AFTER(MSEC(800+(200*arg)), k, _KEY_loop, arg);
      3c8:	28 ea       	ldi	r18, 0xA8	; 168
      3ca:	31 e6       	ldi	r19, 0x61	; 97
      3cc:	d5 01       	movw	r26, r10
@@ -737,8 +566,6 @@ int _KEY_loop(KEY *k, int arg){
      410:	30 e0       	ldi	r19, 0x00	; 0
      412:	a9 01       	movw	r20, r18
      414:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-	}
-	return 0;
      418:	80 e0       	ldi	r24, 0x00	; 0
      41a:	90 e0       	ldi	r25, 0x00	; 0
      41c:	df 91       	pop	r29
@@ -756,12 +583,6 @@ int _KEY_loop(KEY *k, int arg){
      434:	08 95       	ret
 
 00000436 <KEY_pwmSel>:
- *  Author: Daniel
- */ 
-
-#include "KEY.h"
-
-int KEY_pwmSel(KEY *k, int arg){
      436:	cf 92       	push	r12
      438:	df 92       	push	r13
      43a:	ef 92       	push	r14
@@ -771,11 +592,8 @@ int KEY_pwmSel(KEY *k, int arg){
      442:	cf 93       	push	r28
      444:	df 93       	push	r29
      446:	ec 01       	movw	r28, r24
-	if(!(PINE & (1<<PINE3))){
      448:	63 99       	sbic	0x0c, 3	; 12
      44a:	4f c0       	rjmp	.+158    	; 0x4ea <KEY_pwmSel+0xb4>
-		//RIGHT
-		if(k->guiSel == k->GUI2){
      44c:	ec 81       	ldd	r30, Y+4	; 0x04
      44e:	fd 81       	ldd	r31, Y+5	; 0x05
      450:	88 89       	ldd	r24, Y+16	; 0x10
@@ -783,7 +601,6 @@ int KEY_pwmSel(KEY *k, int arg){
      454:	e8 17       	cp	r30, r24
      456:	f9 07       	cpc	r31, r25
      458:	c1 f4       	brne	.+48     	; 0x48a <KEY_pwmSel+0x54>
-			GUI_stopBlink(k->guiSel);
      45a:	14 8a       	std	Z+20, r1	; 0x14
      45c:	13 8a       	std	Z+19, r1	; 0x13
      45e:	0c 81       	ldd	r16, Y+4	; 0x04
@@ -804,15 +621,11 @@ int KEY_pwmSel(KEY *k, int arg){
      47c:	70 e0       	ldi	r23, 0x00	; 0
      47e:	cb 01       	movw	r24, r22
      480:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			k->guiSel = NULL;
      484:	1d 82       	std	Y+5, r1	; 0x05
      486:	1c 82       	std	Y+4, r1	; 0x04
      488:	80 c0       	rjmp	.+256    	; 0x58a <__stack+0x8b>
-		}else{
-			k->guiSel = k->GUI2;
      48a:	9d 83       	std	Y+5, r25	; 0x05
      48c:	8c 83       	std	Y+4, r24	; 0x04
-			GUI_stopBlink(k->GUI1);
      48e:	ee 85       	ldd	r30, Y+14	; 0x0e
      490:	ff 85       	ldd	r31, Y+15	; 0x0f
      492:	14 8a       	std	Z+20, r1	; 0x14
@@ -835,7 +648,6 @@ int KEY_pwmSel(KEY *k, int arg){
      4b4:	70 e0       	ldi	r23, 0x00	; 0
      4b6:	cb 01       	movw	r24, r22
      4b8:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			GUI_startBlink(k->guiSel);
      4bc:	ec 81       	ldd	r30, Y+4	; 0x04
      4be:	fd 81       	ldd	r31, Y+5	; 0x05
      4c0:	14 8a       	std	Z+20, r1	; 0x14
@@ -858,12 +670,8 @@ int KEY_pwmSel(KEY *k, int arg){
      4e2:	cb 01       	movw	r24, r22
      4e4:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
      4e8:	50 c0       	rjmp	.+160    	; 0x58a <__stack+0x8b>
-		}
-	}else if(!(PINE & (1<<PINE2))){
      4ea:	62 99       	sbic	0x0c, 2	; 12
      4ec:	4e c0       	rjmp	.+156    	; 0x58a <__stack+0x8b>
-		//LEFT
-		if(k->guiSel == k->GUI1){
      4ee:	ec 81       	ldd	r30, Y+4	; 0x04
      4f0:	fd 81       	ldd	r31, Y+5	; 0x05
      4f2:	8e 85       	ldd	r24, Y+14	; 0x0e
@@ -871,7 +679,6 @@ int KEY_pwmSel(KEY *k, int arg){
      4f6:	e8 17       	cp	r30, r24
      4f8:	f9 07       	cpc	r31, r25
      4fa:	c1 f4       	brne	.+48     	; 0x52c <__stack+0x2d>
-			GUI_stopBlink(k->guiSel);
      4fc:	14 8a       	std	Z+20, r1	; 0x14
      4fe:	13 8a       	std	Z+19, r1	; 0x13
      500:	0c 81       	ldd	r16, Y+4	; 0x04
@@ -892,15 +699,11 @@ int KEY_pwmSel(KEY *k, int arg){
      51e:	70 e0       	ldi	r23, 0x00	; 0
      520:	cb 01       	movw	r24, r22
      522:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			k->guiSel = NULL;
      526:	1d 82       	std	Y+5, r1	; 0x05
      528:	1c 82       	std	Y+4, r1	; 0x04
      52a:	2f c0       	rjmp	.+94     	; 0x58a <__stack+0x8b>
-		}else{
-			k->guiSel = k->GUI1;
      52c:	9d 83       	std	Y+5, r25	; 0x05
      52e:	8c 83       	std	Y+4, r24	; 0x04
-			GUI_stopBlink(k->GUI2);
      530:	e8 89       	ldd	r30, Y+16	; 0x10
      532:	f9 89       	ldd	r31, Y+17	; 0x11
      534:	14 8a       	std	Z+20, r1	; 0x14
@@ -923,7 +726,6 @@ int KEY_pwmSel(KEY *k, int arg){
      556:	70 e0       	ldi	r23, 0x00	; 0
      558:	cb 01       	movw	r24, r22
      55a:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			GUI_startBlink(k->guiSel);
      55e:	ec 81       	ldd	r30, Y+4	; 0x04
      560:	fd 81       	ldd	r31, Y+5	; 0x05
      562:	14 8a       	std	Z+20, r1	; 0x14
@@ -945,10 +747,6 @@ int KEY_pwmSel(KEY *k, int arg){
      582:	70 e0       	ldi	r23, 0x00	; 0
      584:	cb 01       	movw	r24, r22
      586:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-		}
-	}
-	return 0;
-}
      58a:	80 e0       	ldi	r24, 0x00	; 0
      58c:	90 e0       	ldi	r25, 0x00	; 0
      58e:	df 91       	pop	r29
@@ -962,12 +760,6 @@ int KEY_pwmSel(KEY *k, int arg){
      59e:	08 95       	ret
 
 000005a0 <KEY_pwmInc>:
-int _KEY_allowEnter(KEY *k, int arg){
-	k->enterEn = 1;
-	return 0;
-}
-
-int KEY_pwmInc(KEY *k, int arg){
      5a0:	8f 92       	push	r8
      5a2:	9f 92       	push	r9
      5a4:	af 92       	push	r10
@@ -980,7 +772,6 @@ int KEY_pwmInc(KEY *k, int arg){
      5b2:	1f 93       	push	r17
      5b4:	cf 93       	push	r28
      5b6:	df 93       	push	r29
-	if(k->guiSel == NULL)
      5b8:	fc 01       	movw	r30, r24
      5ba:	a4 80       	ldd	r10, Z+4	; 0x04
      5bc:	b5 80       	ldd	r11, Z+5	; 0x05
@@ -989,17 +780,12 @@ int KEY_pwmInc(KEY *k, int arg){
      5c2:	09 f4       	brne	.+2      	; 0x5c6 <KEY_pwmInc+0x26>
      5c4:	fc c0       	rjmp	.+504    	; 0x7be <KEY_pwmInc+0x21e>
      5c6:	ec 01       	movw	r28, r24
-	return;
-	GUI *guin = (k->guiSel);
-	PWM *pwmn = &(guin->p);
      5c8:	45 01       	movw	r8, r10
      5ca:	f4 e0       	ldi	r31, 0x04	; 4
      5cc:	8f 0e       	add	r8, r31
      5ce:	91 1c       	adc	r9, r1
-	if(!(PINB & (1<<PINB7))){
      5d0:	1f 99       	sbic	0x03, 7	; 3
      5d2:	33 c0       	rjmp	.+102    	; 0x63a <KEY_pwmInc+0x9a>
-		KEY_scrollDown(k);
      5d4:	cc 24       	eor	r12, r12
      5d6:	ca 94       	dec	r12
      5d8:	dc 2c       	mov	r13, r12
@@ -1049,10 +835,8 @@ int KEY_pwmInc(KEY *k, int arg){
      632:	90 e0       	ldi	r25, 0x00	; 0
      634:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
      638:	ae c0       	rjmp	.+348    	; 0x796 <KEY_pwmInc+0x1f6>
-		}else if(!(PINB & (1<<PINB6))){
      63a:	1e 99       	sbic	0x03, 6	; 3
      63c:	30 c0       	rjmp	.+96     	; 0x69e <KEY_pwmInc+0xfe>
-		KEY_scrollUp(k);
      63e:	cc 24       	eor	r12, r12
      640:	c3 94       	inc	r12
      642:	d1 2c       	mov	r13, r1
@@ -1099,21 +883,15 @@ int KEY_pwmInc(KEY *k, int arg){
      696:	90 e0       	ldi	r25, 0x00	; 0
      698:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
      69c:	7c c0       	rjmp	.+248    	; 0x796 <KEY_pwmInc+0x1f6>
-		}else if(!(PINB & (1<<PINB4))){
      69e:	1c 99       	sbic	0x03, 4	; 3
      6a0:	74 c0       	rjmp	.+232    	; 0x78a <KEY_pwmInc+0x1ea>
-		//ENTER
-		if(!k->enterEn)
      6a2:	8c 85       	ldd	r24, Y+12	; 0x0c
      6a4:	9d 85       	ldd	r25, Y+13	; 0x0d
      6a6:	89 2b       	or	r24, r25
      6a8:	09 f4       	brne	.+2      	; 0x6ac <KEY_pwmInc+0x10c>
      6aa:	89 c0       	rjmp	.+274    	; 0x7be <KEY_pwmInc+0x21e>
-		return;
-		k->enterEn = 0;
      6ac:	1d 86       	std	Y+13, r1	; 0x0d
      6ae:	1c 86       	std	Y+12, r1	; 0x0c
-		AFTER(MSEC(500), k, _KEY_allowEnter, 0);
      6b0:	c1 2c       	mov	r12, r1
      6b2:	d1 2c       	mov	r13, r1
      6b4:	0f 2e       	mov	r0, r31
@@ -1131,7 +909,6 @@ int KEY_pwmInc(KEY *k, int arg){
      6cc:	80 e0       	ldi	r24, 0x00	; 0
      6ce:	90 e0       	ldi	r25, 0x00	; 0
      6d0:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-		if(PWM_getFreq(pwmn) == 0){
      6d4:	40 e0       	ldi	r20, 0x00	; 0
      6d6:	50 e0       	ldi	r21, 0x00	; 0
      6d8:	63 ee       	ldi	r22, 0xE3	; 227
@@ -1140,7 +917,6 @@ int KEY_pwmInc(KEY *k, int arg){
      6de:	0e 94 f8 0f 	call	0x1ff0	; 0x1ff0 <sync>
      6e2:	89 2b       	or	r24, r25
      6e4:	49 f5       	brne	.+82     	; 0x738 <KEY_pwmInc+0x198>
-			PWM_setFreq(pwmn, GUI_getAltFreq(guin));
      6e6:	40 e0       	ldi	r20, 0x00	; 0
      6e8:	50 e0       	ldi	r21, 0x00	; 0
      6ea:	6c e7       	ldi	r22, 0x7C	; 124
@@ -1162,7 +938,6 @@ int KEY_pwmInc(KEY *k, int arg){
      70c:	70 e0       	ldi	r23, 0x00	; 0
      70e:	cb 01       	movw	r24, r22
      710:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			GUI_setAltFreq(guin, 0);
      714:	c1 2c       	mov	r12, r1
      716:	d1 2c       	mov	r13, r1
      718:	0f 2e       	mov	r0, r31
@@ -1180,10 +955,6 @@ int KEY_pwmInc(KEY *k, int arg){
      730:	cb 01       	movw	r24, r22
      732:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
      736:	2f c0       	rjmp	.+94     	; 0x796 <KEY_pwmInc+0x1f6>
-			//pwmn->freq = guin->altFreq;
-			//guin->altFreq = 0;
-			}else{
-			GUI_setAltFreq(guin, PWM_getFreq(pwmn));
      738:	40 e0       	ldi	r20, 0x00	; 0
      73a:	50 e0       	ldi	r21, 0x00	; 0
      73c:	63 ee       	ldi	r22, 0xE3	; 227
@@ -1205,7 +976,6 @@ int KEY_pwmInc(KEY *k, int arg){
      75e:	70 e0       	ldi	r23, 0x00	; 0
      760:	cb 01       	movw	r24, r22
      762:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-			PWM_setFreq(pwmn, 0);
      766:	c1 2c       	mov	r12, r1
      768:	d1 2c       	mov	r13, r1
      76a:	0f 2e       	mov	r0, r31
@@ -1223,20 +993,12 @@ int KEY_pwmInc(KEY *k, int arg){
      782:	cb 01       	movw	r24, r22
      784:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
      788:	06 c0       	rjmp	.+12     	; 0x796 <KEY_pwmInc+0x1f6>
-			//guin->altFreq = pwmn->freq;
-			//pwmn->freq = 0;
-		}
-		
-		}else if((PINB & (1<<PINB7)) && (PINB & (1<<PINB6))){
      78a:	1f 9b       	sbis	0x03, 7	; 3
      78c:	04 c0       	rjmp	.+8      	; 0x796 <KEY_pwmInc+0x1f6>
      78e:	1e 9b       	sbis	0x03, 6	; 3
      790:	02 c0       	rjmp	.+4      	; 0x796 <KEY_pwmInc+0x1f6>
-		KEY_scrollStop(k);
      792:	1b 86       	std	Y+11, r1	; 0x0b
      794:	1a 86       	std	Y+10, r1	; 0x0a
-	}
-	GUI_print(guin);
      796:	c1 2c       	mov	r12, r1
      798:	d1 2c       	mov	r13, r1
      79a:	0f 2e       	mov	r0, r31
@@ -1253,11 +1015,9 @@ int KEY_pwmInc(KEY *k, int arg){
      7b0:	70 e0       	ldi	r23, 0x00	; 0
      7b2:	cb 01       	movw	r24, r22
      7b4:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-	return 0;
      7b8:	80 e0       	ldi	r24, 0x00	; 0
      7ba:	90 e0       	ldi	r25, 0x00	; 0
      7bc:	00 c0       	rjmp	.+0      	; 0x7be <KEY_pwmInc+0x21e>
-}
      7be:	df 91       	pop	r29
      7c0:	cf 91       	pop	r28
      7c2:	1f 91       	pop	r17
@@ -1273,19 +1033,12 @@ int KEY_pwmInc(KEY *k, int arg){
      7d6:	08 95       	ret
 
 000007d8 <launch>:
-
-static GUI GUI1 = init_GUI(init_PWM(&PORTE, PINE4), 0);
-static GUI GUI2 = init_GUI(init_PWM(&PORTE, PINE6), 4);
-static KEY KEYN = init_KEY(&GUI1,&GUI2);
-
-void launch(Object *o, int arg){
      7d8:	cf 92       	push	r12
      7da:	df 92       	push	r13
      7dc:	ef 92       	push	r14
      7de:	ff 92       	push	r15
      7e0:	0f 93       	push	r16
      7e2:	1f 93       	push	r17
-	GUI_init(&GUI1);
      7e4:	cc 24       	eor	r12, r12
      7e6:	c3 94       	inc	r12
      7e8:	d1 2c       	mov	r13, r1
@@ -1321,7 +1074,6 @@ void launch(Object *o, int arg){
      826:	70 e0       	ldi	r23, 0x00	; 0
      828:	cb 01       	movw	r24, r22
      82a:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-	GUI_init(&GUI2);
      82e:	cc 24       	eor	r12, r12
      830:	c3 94       	inc	r12
      832:	d1 2c       	mov	r13, r1
@@ -1357,7 +1109,6 @@ void launch(Object *o, int arg){
      870:	70 e0       	ldi	r23, 0x00	; 0
      872:	cb 01       	movw	r24, r22
      874:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-}
      878:	1f 91       	pop	r17
      87a:	0f 91       	pop	r16
      87c:	ff 90       	pop	r15
@@ -1367,32 +1118,21 @@ void launch(Object *o, int arg){
      884:	08 95       	ret
 
 00000886 <main>:
-
-int main() {
-	sei();
      886:	78 94       	sei
-	
-	LCD_init();
      888:	06 dc       	rcall	.-2036   	; 0x96 <LCD_init>
-	BTN_init();
      88a:	12 dc       	rcall	.-2012   	; 0xb0 <BTN_init>
-	
-	INSTALL(&KEYN, KEY_pwmInc, IRQ_PCINT1);
      88c:	42 e0       	ldi	r20, 0x02	; 2
      88e:	60 ed       	ldi	r22, 0xD0	; 208
      890:	72 e0       	ldi	r23, 0x02	; 2
      892:	80 e0       	ldi	r24, 0x00	; 0
      894:	91 e0       	ldi	r25, 0x01	; 1
      896:	0e 94 05 11 	call	0x220a	; 0x220a <install>
-	INSTALL(&KEYN, KEY_pwmSel, IRQ_PCINT0);
      89a:	41 e0       	ldi	r20, 0x01	; 1
      89c:	6b e1       	ldi	r22, 0x1B	; 27
      89e:	72 e0       	ldi	r23, 0x02	; 2
      8a0:	80 e0       	ldi	r24, 0x00	; 0
      8a2:	91 e0       	ldi	r25, 0x01	; 1
      8a4:	0e 94 05 11 	call	0x220a	; 0x220a <install>
-	
-	return TINYTIMBER(NULL,launch,0);
      8a8:	40 e0       	ldi	r20, 0x00	; 0
      8aa:	50 e0       	ldi	r21, 0x00	; 0
      8ac:	6c ee       	ldi	r22, 0xEC	; 236
@@ -1403,12 +1143,6 @@ int main() {
      8b8:	08 95       	ret
 
 000008ba <PWM_init_pulseLoop>:
- *  Author: Daniel
- */ 
-
-#include "PWM.h"
-
-int PWM_init_pulseLoop(PWM *p, int arg){
      8ba:	cf 92       	push	r12
      8bc:	df 92       	push	r13
      8be:	ef 92       	push	r14
@@ -1418,12 +1152,10 @@ int PWM_init_pulseLoop(PWM *p, int arg){
      8c6:	cf 93       	push	r28
      8c8:	df 93       	push	r29
      8ca:	ec 01       	movw	r28, r24
-	if(p->freq){
      8cc:	8c 81       	ldd	r24, Y+4	; 0x04
      8ce:	9d 81       	ldd	r25, Y+5	; 0x05
      8d0:	89 2b       	or	r24, r25
      8d2:	a1 f1       	breq	.+104    	; 0x93c <PWM_init_pulseLoop+0x82>
-		*(p->reg)^= (1 << p->toggle);
      8d4:	ee 81       	ldd	r30, Y+6	; 0x06
      8d6:	ff 81       	ldd	r31, Y+7	; 0x07
      8d8:	81 e0       	ldi	r24, 0x01	; 1
@@ -1437,7 +1169,6 @@ int PWM_init_pulseLoop(PWM *p, int arg){
      8e8:	90 81       	ld	r25, Z
      8ea:	89 27       	eor	r24, r25
      8ec:	80 83       	st	Z, r24
-		AFTER(USEC(500000/(p->freq)), p, PWM_init_pulseLoop, 0);
      8ee:	2c 81       	ldd	r18, Y+4	; 0x04
      8f0:	3d 81       	ldd	r19, Y+5	; 0x05
      8f2:	03 2e       	mov	r0, r19
@@ -1473,8 +1204,6 @@ int PWM_init_pulseLoop(PWM *p, int arg){
      934:	a9 01       	movw	r20, r18
      936:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
      93a:	20 c0       	rjmp	.+64     	; 0x97c <PWM_init_pulseLoop+0xc2>
-	}else{
-		*(p->reg)&= ~(1 << p->toggle);
      93c:	ee 81       	ldd	r30, Y+6	; 0x06
      93e:	ff 81       	ldd	r31, Y+7	; 0x07
      940:	81 e0       	ldi	r24, 0x01	; 1
@@ -1489,7 +1218,6 @@ int PWM_init_pulseLoop(PWM *p, int arg){
      952:	90 81       	ld	r25, Z
      954:	89 23       	and	r24, r25
      956:	80 83       	st	Z, r24
-		AFTER(SEC(1), p, PWM_init_pulseLoop,0);
      958:	c1 2c       	mov	r12, r1
      95a:	d1 2c       	mov	r13, r1
      95c:	0f 2e       	mov	r0, r31
@@ -1507,9 +1235,6 @@ int PWM_init_pulseLoop(PWM *p, int arg){
      974:	80 e0       	ldi	r24, 0x00	; 0
      976:	90 e0       	ldi	r25, 0x00	; 0
      978:	0e 94 ea 0e 	call	0x1dd4	; 0x1dd4 <async>
-	}
-	return 0;
-}
      97c:	80 e0       	ldi	r24, 0x00	; 0
      97e:	90 e0       	ldi	r25, 0x00	; 0
      980:	df 91       	pop	r29
@@ -1523,83 +1248,59 @@ int PWM_init_pulseLoop(PWM *p, int arg){
      990:	08 95       	ret
 
 00000992 <_PWM_deltaFreq>:
-
-int _PWM_deltaFreq(PWM *p, int arg){
-	arg+= p->freq;
      992:	fc 01       	movw	r30, r24
      994:	24 81       	ldd	r18, Z+4	; 0x04
      996:	35 81       	ldd	r19, Z+5	; 0x05
      998:	62 0f       	add	r22, r18
      99a:	73 1f       	adc	r23, r19
-	if(arg <= 0)
      99c:	16 16       	cp	r1, r22
      99e:	17 06       	cpc	r1, r23
      9a0:	1c f0       	brlt	.+6      	; 0x9a8 <_PWM_deltaFreq+0x16>
-		p->freq = 0;
      9a2:	15 82       	std	Z+5, r1	; 0x05
      9a4:	14 82       	std	Z+4, r1	; 0x04
      9a6:	0c c0       	rjmp	.+24     	; 0x9c0 <_PWM_deltaFreq+0x2e>
-	else if(arg > 99)
      9a8:	64 36       	cpi	r22, 0x64	; 100
      9aa:	71 05       	cpc	r23, r1
      9ac:	34 f0       	brlt	.+12     	; 0x9ba <_PWM_deltaFreq+0x28>
-		p->freq = 99;
      9ae:	23 e6       	ldi	r18, 0x63	; 99
      9b0:	30 e0       	ldi	r19, 0x00	; 0
      9b2:	fc 01       	movw	r30, r24
      9b4:	35 83       	std	Z+5, r19	; 0x05
      9b6:	24 83       	std	Z+4, r18	; 0x04
      9b8:	03 c0       	rjmp	.+6      	; 0x9c0 <_PWM_deltaFreq+0x2e>
-	else
-		p->freq = arg;
      9ba:	fc 01       	movw	r30, r24
      9bc:	75 83       	std	Z+5, r23	; 0x05
      9be:	64 83       	std	Z+4, r22	; 0x04
-	return 0;
-}
      9c0:	80 e0       	ldi	r24, 0x00	; 0
      9c2:	90 e0       	ldi	r25, 0x00	; 0
      9c4:	08 95       	ret
 
 000009c6 <_PWM_getFreq>:
-
-int _PWM_getFreq(PWM *p, int arg){
-	return p->freq;
-}
      9c6:	fc 01       	movw	r30, r24
      9c8:	84 81       	ldd	r24, Z+4	; 0x04
      9ca:	95 81       	ldd	r25, Z+5	; 0x05
      9cc:	08 95       	ret
 
 000009ce <_PWM_setFreq>:
-
-int _PWM_setFreq(PWM *p, int arg){
-	if(arg > 99)
      9ce:	64 36       	cpi	r22, 0x64	; 100
      9d0:	71 05       	cpc	r23, r1
      9d2:	34 f0       	brlt	.+12     	; 0x9e0 <_PWM_setFreq+0x12>
-		p->freq = 99;
      9d4:	23 e6       	ldi	r18, 0x63	; 99
      9d6:	30 e0       	ldi	r19, 0x00	; 0
      9d8:	fc 01       	movw	r30, r24
      9da:	35 83       	std	Z+5, r19	; 0x05
      9dc:	24 83       	std	Z+4, r18	; 0x04
      9de:	0a c0       	rjmp	.+20     	; 0x9f4 <_PWM_setFreq+0x26>
-	else if(arg <= 0)
      9e0:	16 16       	cp	r1, r22
      9e2:	17 06       	cpc	r1, r23
      9e4:	24 f0       	brlt	.+8      	; 0x9ee <_PWM_setFreq+0x20>
-		p->freq = 0;
      9e6:	fc 01       	movw	r30, r24
      9e8:	15 82       	std	Z+5, r1	; 0x05
      9ea:	14 82       	std	Z+4, r1	; 0x04
      9ec:	03 c0       	rjmp	.+6      	; 0x9f4 <_PWM_setFreq+0x26>
-	else
-		p->freq = arg;
      9ee:	fc 01       	movw	r30, r24
      9f0:	75 83       	std	Z+5, r23	; 0x05
      9f2:	64 83       	std	Z+4, r22	; 0x04
-	return 0;
      9f4:	80 e0       	ldi	r24, 0x00	; 0
      9f6:	90 e0       	ldi	r25, 0x00	; 0
      9f8:	08 95       	ret
