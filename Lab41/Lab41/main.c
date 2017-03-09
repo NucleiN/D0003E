@@ -16,7 +16,7 @@ void launch(Object *o, int arg) {
 }
 
 int main() {
-	sei();
+	sei();  //Enables interrupts 
 
 	LCD_init();
 	BTN_init();
