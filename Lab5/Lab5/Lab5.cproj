@@ -118,10 +118,25 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CONTROLLER.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="CONTROLLER.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="TinyTimber.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="TinyTimber.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="USART.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="USART.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
